@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ISBN simple scanner</string>
+    <string name="scan_once">Scan ISBN</string>
 </resources>
