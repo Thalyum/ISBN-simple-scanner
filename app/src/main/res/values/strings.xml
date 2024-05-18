@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">ISBN simple scanner</string>
     <string name="scan_once">Scan ISBN</string>
+    <string name="not_isbn">Not a valid ISBN</string>
 </resources>
