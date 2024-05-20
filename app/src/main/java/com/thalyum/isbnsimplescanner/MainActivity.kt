@@ -58,9 +58,10 @@ class MainActivity : AppCompatActivity() {
                     )
                     // add to list
                     val updatedlist = scanlist.toMutableList()
-                    updatedlist.add((new))
+                    updatedlist.add(new)
                     // update adapter
                     scanadapter.submitList(updatedlist)
+                    scanlist = updatedlist
                     Snackbar.make(binding.root, barcode.rawValue.toString(), Snackbar.LENGTH_SHORT)
                         .show()
                 } else {
