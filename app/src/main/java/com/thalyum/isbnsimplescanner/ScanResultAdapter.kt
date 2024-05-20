@@ -5,10 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
-class ScanResultAdapter(private val dataSet: ArrayList<ScanResult>) :
-    RecyclerView.Adapter<ScanResultAdapter.ScanViewHolder>() {
+class ScanResultAdapter() :
+    ListAdapter<ScanResult, ScanResultAdapter.ScanViewHolder>(ScanResultDiffCallback) {
 
     /**
      * Provide a reference to the type of views that you are using
@@ -46,21 +48,28 @@ class ScanResultAdapter(private val dataSet: ArrayList<ScanResult>) :
     }
 
     // Create new views (invoked by the layout manager)
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ScanViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScanViewHolder {
         // Create a new view, which defines the UI of the list item
-        val view = LayoutInflater.from(viewGroup.context)
-            .inflate(R.layout.scan_result_row, viewGroup, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.scan_result_row, parent, false)
 
         return ScanViewHolder(view)
     }
 
     // Replace the contents of a view (invoked by the layout manager)
-    override fun onBindViewHolder(viewHolder: ScanViewHolder, position: Int) {
-        val scanResult = dataSet[position]
-        viewHolder.bind(scanResult)
+    override fun onBindViewHolder(holder: ScanViewHolder, position: Int) {
+        val scanResult = getItem(position)
+        holder.bind(scanResult)
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
-    override fun getItemCount() = dataSet.size
+    object ScanResultDiffCallback : DiffUtil.ItemCallback<ScanResult>() {
+        override fun areItemsTheSame(oldItem: ScanResult, newItem: ScanResult): Boolean {
+            return oldItem == newItem
+        }
 
+        override fun areContentsTheSame(oldItem: ScanResult, newItem: ScanResult): Boolean {
+            return oldItem.isbn == newItem.isbn
+        }
+    }
 }
+

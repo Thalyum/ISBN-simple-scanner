@@ -12,7 +12,8 @@ import com.thalyum.isbnsimplescanner.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var scanlist: ArrayList<ScanResult>
+    private var scanlist: List<ScanResult> = listOf()
+    private var scanadapter = ScanResultAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,10 +26,9 @@ class MainActivity : AppCompatActivity() {
             requestScan()
         }
 
-        // Init list
-        scanlist = arrayListOf()
-        val adapter = ScanResultAdapter(scanlist)
-        binding.ScanList.adapter = adapter
+        // Setup adapter
+        scanadapter.submitList(scanlist)
+        binding.ScanList.adapter = scanadapter
     }
 
     private fun requestScan() {
@@ -50,13 +50,17 @@ class MainActivity : AppCompatActivity() {
             .addOnSuccessListener { barcode ->
                 // If the result is a valid ISBN, display the value
                 if (barcode.valueType == Barcode.TYPE_ISBN) {
+                    // create new scanResult
                     val new = ScanResult(
                         isbn = barcode.rawValue.toString(),
                         collection_id = 0,
                         sent = false
                     )
-                    // TODO: notify viewer data set was updated
-                    scanlist.add(new)
+                    // add to list
+                    val updatedlist = scanlist.toMutableList()
+                    updatedlist.add((new))
+                    // update adapter
+                    scanadapter.submitList(updatedlist)
                     Snackbar.make(binding.root, barcode.rawValue.toString(), Snackbar.LENGTH_SHORT)
                         .show()
                 } else {
