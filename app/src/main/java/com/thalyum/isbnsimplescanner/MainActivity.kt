@@ -1,7 +1,11 @@
 package com.thalyum.isbnsimplescanner
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.android.volley.Request
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.mlkit.vision.barcode.common.Barcode
@@ -30,11 +34,30 @@ class MainActivity : AppCompatActivity() {
 
         // Setup observer on data
         scans.scanResultLiveData.observe(this) {
-        //scanListViewModel.scanResultsLiveData.observe(this) {
+            //scanListViewModel.scanResultsLiveData.observe(this) {
             it?.let {
                 scanadapter.submitList(it)
+                request()
             }
         }
+    }
+
+    fun request() {
+        // Instantiate the RequestQueue.
+        val queue = Volley.newRequestQueue(this)
+        val url = "https://www.google.com"
+
+        // Request a string response from the provided URL.
+        val stringRequest = StringRequest(
+            Request.Method.GET, url,
+            { response ->
+                // Display the first 500 characters of the response string.
+                Log.v("PER", "Response is: ${response.substring(0, 500)}")
+            },
+            { Log.v("PER", "That didn't work!") })
+
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest)
     }
 
     private fun requestScan() {
@@ -67,7 +90,7 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     // otherwise, notice the user that it is not a valid ISBN
                     Snackbar.make(binding.root, R.string.not_isbn, Snackbar.LENGTH_SHORT)
-                        .addCallback(object: BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                        .addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
                             // once the notification is dismissed, scan again
                             override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                                 super.onDismissed(transientBottomBar, event)
