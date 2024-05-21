@@ -1,6 +1,5 @@
 package com.thalyum.isbnsimplescanner
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
 /* Handles operations on scanLiveData and holds details about it. */
