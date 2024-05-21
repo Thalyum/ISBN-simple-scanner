@@ -12,12 +12,11 @@ import com.thalyum.isbnsimplescanner.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private var scanlist: List<ScanResult> = listOf()
     private var scanadapter = ScanResultAdapter()
+    private var scans = ScanDataSource()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -27,8 +26,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Setup adapter
-        scanadapter.submitList(scanlist)
         binding.ScanList.adapter = scanadapter
+
+        // Setup observer on data
+        scans.scanResultLiveData.observe(this) {
+        //scanListViewModel.scanResultsLiveData.observe(this) {
+            it?.let {
+                scanadapter.submitList(it)
+            }
+        }
     }
 
     private fun requestScan() {
@@ -57,13 +63,7 @@ class MainActivity : AppCompatActivity() {
                         sent = false
                     )
                     // add to list
-                    val updatedlist = scanlist.toMutableList()
-                    updatedlist.add(new)
-                    // update adapter
-                    scanadapter.submitList(updatedlist)
-                    scanlist = updatedlist
-                    Snackbar.make(binding.root, barcode.rawValue.toString(), Snackbar.LENGTH_SHORT)
-                        .show()
+                    scans.addScanResult(new)
                 } else {
                     // otherwise, notice the user that it is not a valid ISBN
                     Snackbar.make(binding.root, R.string.not_isbn, Snackbar.LENGTH_SHORT)
