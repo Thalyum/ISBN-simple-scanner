@@ -9,8 +9,6 @@ import com.android.volley.toolbox.Volley
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.mlkit.vision.barcode.common.Barcode
-import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
-import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import com.thalyum.isbnsimplescanner.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -18,6 +16,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var scanadapter = ScanResultAdapter()
     private var scans = ScanDataSource()
+    private var scanner = BarcodeScanner().setup(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,20 +60,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestScan() {
-        // Setup barcode scanner options
-        val options = GmsBarcodeScannerOptions
-            .Builder()
-            // Only read EAN_13 format
-            .setBarcodeFormats(
-                Barcode.FORMAT_EAN_13
-            )
-            // Enable automatic zoom
-            .enableAutoZoom()
-            .build()
-
-        // Get scanner client with custom options
-        val scanner = GmsBarcodeScanning.getClient(this, options)
-
         scanner.startScan()
             .addOnSuccessListener { barcode ->
                 // If the result is a valid ISBN, display the value
