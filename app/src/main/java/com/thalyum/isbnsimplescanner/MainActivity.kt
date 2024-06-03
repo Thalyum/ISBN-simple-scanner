@@ -23,9 +23,15 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Init button callback
+        // Init buttons callback
+        // Scan only once
         binding.ScanOnceBtn.setOnClickListener {
             requestScan()
+            scanOnce()
+        }
+        // Scan until user stops
+        binding.ScanCollectionBtn.setOnClickListener {
+            }
         }
 
         // Setup adapter
@@ -59,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         queue.add(stringRequest)
     }
 
-    private fun requestScan() {
+    private fun scanOnce() {
         scanner.startScan()
             .addOnSuccessListener { barcode ->
                 // If the result is a valid ISBN, display the value
@@ -79,7 +85,37 @@ class MainActivity : AppCompatActivity() {
                             // once the notification is dismissed, scan again
                             override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                                 super.onDismissed(transientBottomBar, event)
-                                requestScan()
+                                scanOnce()
+                            }
+                        })
+                        .show()
+                }
+            }
+    }
+
+    private fun scanCollection(collectionId: Int) {
+        scanner.startScan()
+            .addOnSuccessListener { barcode ->
+                // If the result is a valid ISBN, display the value
+                if (barcode.valueType == Barcode.TYPE_ISBN) {
+                    // create new scanResult
+                    val new = ScanResult(
+                        isbn = barcode.rawValue.toString(),
+                        collection_id = 0,
+                        sent = false
+                    )
+                    // add to list
+                    scans.addScanResult(new)
+                    // rescan
+                    scanCollection(collectionId)
+                } else {
+                    // otherwise, notice the user that it is not a valid ISBN
+                    Snackbar.make(binding.root, R.string.not_isbn, Snackbar.LENGTH_SHORT)
+                        .addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                            // once the notification is dismissed, scan again
+                            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                                super.onDismissed(transientBottomBar, event)
+                                scanCollection(collectionId)
                             }
                         })
                         .show()

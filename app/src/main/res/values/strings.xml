@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">ISBN simple scanner</string>
-    <string name="scan_once">Scan ISBN</string>
+    <string name="scan_once">Scan single ISBN</string>
+    <string name="scan_collection">Scan collection</string>
     <string name="isbn_title">ISBN</string>
     <string name="collection_id_title">Collection ID</string>
     <string name="send_status_title">Send status</string>
