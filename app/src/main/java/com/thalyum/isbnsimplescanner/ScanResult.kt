@@ -4,6 +4,6 @@ package com.thalyum.isbnsimplescanner
 data class ScanResult(
     val isbn: String,
     val collection_id: Int,
-    val sent: Boolean
+    var sent: Boolean
 )
 

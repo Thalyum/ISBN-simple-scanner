@@ -9,4 +9,5 @@
     <string name="no_collection">None</string>
     <string name="result_sent">Sent</string>
     <string name="result_not_sent">Not Sent</string>
+    <string name="error_collection_id">Error while retrieving the requested collection ID. Try Again.</string>
 </resources>

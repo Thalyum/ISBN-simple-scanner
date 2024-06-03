@@ -21,4 +21,14 @@ class ScanDataSource {
             scanResultLiveData.postValue(updatedList)
         }
     }
+
+    // Update the 'sent' status of ScanResults by batch
+    fun updateScanSentStatus(index: Int) {
+        val currentList = scanResultLiveData.value
+        if (currentList != null) {
+            val updatedList = currentList.toMutableList()
+            updatedList[index].sent = true
+            scanResultLiveData.postValue(updatedList)
+        }
+    }
 }

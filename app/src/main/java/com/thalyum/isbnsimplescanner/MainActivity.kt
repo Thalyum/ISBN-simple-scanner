@@ -3,9 +3,6 @@ package com.thalyum.isbnsimplescanner
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.android.volley.Request
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.mlkit.vision.barcode.common.Barcode
@@ -17,6 +14,7 @@ class MainActivity : AppCompatActivity() {
     private var scanadapter = ScanResultAdapter()
     private var scans = ScanDataSource()
     private var scanner = BarcodeScanner().setup(this)
+    private var http = Http(this, "http://192.168.1.127:8080")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,43 +24,35 @@ class MainActivity : AppCompatActivity() {
         // Init buttons callback
         // Scan only once
         binding.ScanOnceBtn.setOnClickListener {
-            requestScan()
             scanOnce()
         }
         // Scan until user stops
         binding.ScanCollectionBtn.setOnClickListener {
+            // request collection id
+            // the response listener will start the scanning loop
+            val id = http.requestCollectionByName("test")
+            if (id >= 0) {
+                scanCollection(id)
+            } else {
+                Log.v(
+                    "Scan Collection",
+                    "Error while getting the requested collection id. Aborting."
+                )
+                Snackbar.make(binding.root, R.string.error_collection_id, Snackbar.LENGTH_SHORT)
+                    .show()
             }
         }
 
         // Setup adapter
         binding.ScanList.adapter = scanadapter
 
-        // Setup observer on data
+        // Setup observer on live data
         scans.scanResultLiveData.observe(this) {
-            //scanListViewModel.scanResultsLiveData.observe(this) {
             it?.let {
                 scanadapter.submitList(it)
-                request()
+                http.requestRegisterNewISBN(scans)
             }
         }
-    }
-
-    fun request() {
-        // Instantiate the RequestQueue.
-        val queue = Volley.newRequestQueue(this)
-        val url = "https://www.google.com"
-
-        // Request a string response from the provided URL.
-        val stringRequest = StringRequest(
-            Request.Method.GET, url,
-            { response ->
-                // Display the first 500 characters of the response string.
-                Log.v("PER", "Response is: ${response.substring(0, 500)}")
-            },
-            { Log.v("PER", "That didn't work!") })
-
-        // Add the request to the RequestQueue.
-        queue.add(stringRequest)
     }
 
     private fun scanOnce() {
